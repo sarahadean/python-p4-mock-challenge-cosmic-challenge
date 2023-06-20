@@ -22,6 +22,8 @@ class Scientist(db.Model, SerializerMixin):
     serializer_rule = ('-scientist_missions.scientist')
 
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     name = db.Column(db.String, unique=True, nullable=False)
     field_of_study = db.Column(db.String, nullable=False)
     avatar = db.Column(db.String)
@@ -29,6 +31,7 @@ class Scientist(db.Model, SerializerMixin):
     planets = association_proxy('scientist_missions', 'planet')
     scientist_missions = db.relationship('Mission', back_populates='scientist')
 
+  #get list of names and check if name not in list.
     @validates('name','field_of_study')
     def validate_scientist(self, key, string):
         if key == 'name':
@@ -48,8 +51,9 @@ class Planet(db.Model, SerializerMixin):
     __tablename__ = 'planets'
 
     serialize_only = ('name', 'distance_from_earth', 'nearest_star', 'image')
-
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     name = db.Column(db.String)
     distance_from_earth = db.Column(db.String)
     nearest_star = db.Column(db.String)
@@ -63,9 +67,11 @@ class Mission(db.Model, SerializerMixin):
     serializer_rules = ('-scientist.scientist_missions', '-planet.planet_missions')
 
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     name = db.Column(db.String)
-    scientist_id = db.Column(db.Integer, db.ForeignKey('scientists.id'))
-    planet_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
+    scientist_id = db.Column(db.Integer, db.ForeignKey('scientists.id'), nullable=False)
+    planet_id = db.Column(db.Integer, db.ForeignKey('planets.id'), nullable=False)
 
     scientist = db.relationship('Scientist', back_populates='scientist_missions')
     planet = db.relationship('Planet', back_populates='planet_missions')
